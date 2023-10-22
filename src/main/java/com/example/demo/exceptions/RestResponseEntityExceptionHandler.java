@@ -35,4 +35,10 @@ public class RestResponseEntityExceptionHandler {
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
 
+    @ExceptionHandler(UnauthorizedAccessException.class)
+    public ResponseEntity<String> handleInvalidDate(UnauthorizedAccessException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+
+
 }

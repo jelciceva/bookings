@@ -5,8 +5,6 @@ import com.example.demo.entities.Booking;
 import com.example.demo.exceptions.*;
 import com.example.demo.repositories.BlockRepository;
 import com.example.demo.repositories.BookingRepository;
-//import com.example.demo.repositories.PropertyRepository;
-//import com.example.demo.repositories.UserRepository;
 import com.example.demo.repositories.PropertyRepository;
 import com.example.demo.repositories.UserRepository;
 import org.slf4j.Logger;
@@ -36,17 +34,13 @@ public class BookingService {
     private UserRepository userRepository;
     private static final Logger log = LoggerFactory.getLogger(BookingService.class);
 
-    // Create a new booking
     public Booking createBooking(Booking booking) {
 
-     System.out.println("USO JE OVDE?");
         if(userRepository.findById(booking.getGuestId()).isEmpty()){
-            System.out.println("er1");
             throw new  GuestNotFoundException("Guest not found with id:" + booking.getGuestId());
         }
 
         if(propertyRepository.findById(booking.getPropertyId()).isEmpty()){
-            System.out.println("er2");
             throw new PropertyNotFoundException("Property not found with id:" + booking.getPropertyId());
         }
 

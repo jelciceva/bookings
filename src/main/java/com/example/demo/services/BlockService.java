@@ -5,8 +5,9 @@ import com.example.demo.entities.Booking;
 import com.example.demo.exceptions.*;
 import com.example.demo.repositories.BlockRepository;
 import com.example.demo.repositories.BookingRepository;
-//import com.example.demo.repositories.PropertyRepository;
-//import com.example.demo.repositories.UserRepository;
+
+import com.example.demo.repositories.PropertyRepository;
+import com.example.demo.repositories.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,35 +28,39 @@ public class BlockService {
     @Autowired
     private BlockRepository blockRepository;
 
-//    @Autowired
-//    private PropertyRepository propertyRepository;
-
+    @Autowired
+    private PropertyRepository propertyRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     private static final Logger log = LoggerFactory.getLogger(BookingService.class);
-    // Create a new block
     public Block createBlock(Block block) {
+        if(userRepository.findById(block.getUserId()).isEmpty()){
+            throw new  GuestNotFoundException("Guest not found with id:" + block.getUserId());
+        }
+
+        if(propertyRepository.findById(block.getPropertyId()).isEmpty()){
+            throw new PropertyNotFoundException("Property not found with id:" + block.getPropertyId());
+        }
+
         validateUser(block);
         validateDates(block);
         return blockRepository.save(block);
     }
 
-    // Get all blocks
     public List<Block> getAllBlocks() {
         return blockRepository.findAll();
     }
 
-    // Get a block by ID
     public Block getBlockById(UUID id) {
         return blockRepository.findById(id).orElse(null);
     }
 
-    // Update a block
     public Block updateBlock(UUID id, Block newBlock) {
         validateUser(newBlock);
         validateDates(newBlock);
         Block existingBlock = blockRepository.findById(id).orElse(null);
         if (existingBlock != null) {
-            // Add validation logic to check for overlaps with other bookings/blocks here
             existingBlock.setStartDate(newBlock.getStartDate());
             existingBlock.setEndDate(newBlock.getEndDate());
             return blockRepository.save(existingBlock);
@@ -64,10 +69,10 @@ public class BlockService {
     }
 
     private void validateUser(Block block){
-//       if( propertyRepository.findUserWithValidRightsbyUserId(block.getPropertyId(), block.getUserId()).isEmpty()){
-//           throw new UnauthorizedAccessException("User with ID " + block.getUserId() + " does not have permission to perform this operation on the Block.");
-//
-//       }
+       if( propertyRepository.findUserWithValidRightsbyUserId(block.getPropertyId(), block.getUserId()).isEmpty()){
+           throw new UnauthorizedAccessException("User with ID " + block.getUserId() + " does not have permission to perform this operation on the Block.");
+
+       }
     }
 
     private void validateDates(Block block){
@@ -86,7 +91,6 @@ public class BlockService {
 
     }
 
-    // Delete a block
     public void deleteBlock(UUID id) {
 
         Optional<Block> blockOptional = blockRepository.findById(id);
